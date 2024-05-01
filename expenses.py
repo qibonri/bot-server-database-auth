@@ -5,6 +5,19 @@ from db_queries import IncomeExpensesQueries
 
 
 class Expense(NamedTuple):
+    """Объект, описывающий расход.
+        :param id: Уникальный идентификатор расхода.
+        :type id: int
+        :param category: Категория расхода.
+        :type category: str
+        :param subcategory: Подкатегория расхода.
+        :type subcategory: str
+        :param time: Время совершения расхода.
+        :type time: str
+        :param amount: Сумма расхода.
+        :type amount: int
+        :param description: Описание расхода.
+        :type description: str"""
     id: int
     category: str
     subcategory: str
@@ -25,6 +38,16 @@ def add_expense(
     subcategory: str,
     amount: str,
 ) -> Expense:
+    """Добавление нового расхода в базу данных.
+        :param category: Категория расхода.
+        :type category: str
+        :param subcategory: Подкатегория расхода.
+        :type subcategory: str
+        :param amount: Сумма расхода.
+        :type amount: str
+        :returns: Объект расхода.
+        :rtype: Expense
+        """
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     description = IncomeExpensesQueries().get_expenses_description(subcategory)
     IncomeExpensesQueries().insert(
@@ -47,5 +70,11 @@ def add_expense(
 
 
 def parse_stats_query(query: List[Tuple[str]]) -> Tuple[Any, Any, Any]:
+    """Парсинг результата запроса, возвращающего статистику расходов.
+    :param query: Результат запроса.
+    :type query: List[Tuple[str]]
+    :returns: Кортеж, содержащий суммы, подкатегории и категории расходов.
+    :rtype: Tuple[Any, Any, Any]
+    """
     amount, subcategorie, categorie = zip(*query)
     return amount, subcategorie, categorie
