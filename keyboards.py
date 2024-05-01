@@ -40,7 +40,6 @@ class MainMenu(Keyboard):
         super().__init__(button_names)
 
 
-#  Expense keyboards
 class ExpensesCategories(Keyboard):
     def __init__(self):
         button_names = IncomeExpensesQueries().get_categories(
@@ -113,7 +112,6 @@ expenses_keyboards_dict = {
 }
 
 
-#  Income keyboards
 class IncomeCategories(Keyboard):
     def __init__(self):
         button_names = IncomeExpensesQueries().get_categories(
@@ -122,7 +120,6 @@ class IncomeCategories(Keyboard):
         super().__init__(button_names)
 
 
-#  Stats keyboards
 class TextGraph(Keyboard):
     def __init__(self):
         button_names = [
