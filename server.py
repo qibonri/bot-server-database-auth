@@ -87,7 +87,6 @@ async def income(message: types.Message):
     )
 
 
-#  Getting income categorie
 @dp.message_handler(state=IncomeForm.categorie)
 async def process_income_categorie(message: types.Message, state: FSMContext):
     """Получения дохода по категориям"""
@@ -98,7 +97,6 @@ async def process_income_categorie(message: types.Message, state: FSMContext):
     await message.reply('Введите сумму дохода')
 
 
-#  Check amount not digit
 @dp.message_handler(
     lambda message: not message.text.isdigit(),
     state=IncomeForm.amount
@@ -108,7 +106,6 @@ async def invalid_income_amount(message: types.Message):
     await message.reply('Сумма должна быть числом\nВведите сумму дохода')
 
 
-#  Check amount is digit
 @dp.message_handler(
     lambda message: message.text.isdigit(),
     state=IncomeForm.amount
@@ -129,7 +126,6 @@ async def process_income_amount(message: types.Message, state: FSMContext):
     )
 
 
-#  Set state for Expense Command
 @dp.message_handler(commands='Расходы')
 async def income(message: types.Message):
     """Отобразить меню категорий расходов"""
@@ -166,7 +162,6 @@ async def process_expense_subcategorie(
     await message.reply('Введите сумму расхода')
 
 
-#  Check amount not digit
 @dp.message_handler(
     lambda message: not message.text.isdigit(),
     state=ExpenseForm.amount
@@ -175,7 +170,6 @@ async def invalid_expense_amount(message: types.Message):
     await message.reply('Сумма должна быть числом\nВведите сумму расхода')
 
 
-#  Check amount is digit
 @dp.message_handler(
     lambda message: message.text.isdigit(),
     state=ExpenseForm.amount
