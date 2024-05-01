@@ -14,7 +14,6 @@ class IncomeExpensesQueries(Query):
     def __init__(self):
         super().__init__()
 
-    #  Income, expense queries
     def insert(self, table: str, column_values: Dict):
         columns = ', '.join(column_values.keys())
         values = [tuple(column_values.values())]
@@ -62,7 +61,6 @@ class StatsQueries(Query):
     def __init__(self):
         super().__init__()
 
-    #  Stats queries
     def get_today_stats(self, action: str):
         query = (
             f'SELECT SUM(amount) as summary, subcategorie, categorie '
@@ -143,8 +141,6 @@ class DeleteQueries(Query):
             f'ORDER BY time DESC '
             f'LIMIT 5;'
         )
-
-        # Проверка существования subcategorie
         try:
             self.cursor.execute(query)
         except sqlite3.OperationalError as e:
