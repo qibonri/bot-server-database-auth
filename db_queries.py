@@ -6,6 +6,7 @@ import os
 
 class Query:
     def __init__(self):
+        """Инициализация класса - формы запроса в БД"""
         self.connection = sqlite3.connect(os.path.join('db', 'finances.db'))
         self.cursor = self.connection.cursor()
 
@@ -15,6 +16,12 @@ class IncomeExpensesQueries(Query):
         super().__init__()
 
     def insert(self, table: str, column_values: Dict):
+        """Вставляет данные в таблицу БД.
+        :param table: Название таблицы в которую будут вставлены данные.
+        :type table: str
+        :param column_values: Словарь с названиями столбцов и их значениями.
+        :type column_values: Dict
+        """
         columns = ', '.join(column_values.keys())
         values = [tuple(column_values.values())]
         placeholders = ", ".join("?" * len(column_values.keys()))
@@ -26,12 +33,28 @@ class IncomeExpensesQueries(Query):
         self.connection.commit()
 
     def get_categories(self, table_name: str) -> List[str]:
+        """Получает список подкатегорий из указанной таблицы БД,
+        которые соответствуют указанной категории.
+        :param table_name: Имя таблицы, из которой будут получены подкатегории.
+        :type table_name: str
+        :param categorie_name: Название категории, для которой будут получены подкатегории.
+        :type categorie_name: str
+        :returns: Список подкатегорий.
+        :rtype: List[str]
+        """
         self.cursor.execute(
             f'SELECT categorie FROM {table_name}')
         columns = self.cursor.fetchall()
         return [col[0] for col in columns]
 
     def get_subcategories(self, table_name: str, categorie_name) -> List[str]:
+        """Получает описание расхода из таблицы expenses_subcategories
+        для указанной подкатегории расходов.
+        :param subcategorie_name: Название подкатегории расходов.
+        :type subcategorie_name: str
+        :returns: Описание расхода.
+        :rtype: str
+        """
         self.cursor.execute(
             f'SELECT subcategorie '
             f'FROM {table_name} '
@@ -41,6 +64,13 @@ class IncomeExpensesQueries(Query):
         return [col[0] for col in columns]
 
     def get_expenses_description(self, subcategorie_name: str) -> str:
+        """Получает описание дохода из таблицы income_categories
+        для указанной категории доходов.
+        :param categorie_name: Название категории доходов.
+        :type categorie_name: str
+        :returns: Описание дохода.
+        :rtype: str
+        """
         self.cursor.execute(
             f'SELECT description '
             f'FROM expenses_subcategories '
@@ -49,6 +79,7 @@ class IncomeExpensesQueries(Query):
         return self.cursor.fetchall()[0][0]
 
     def get_income_description(self, categorie_name: str) -> str:
+        """Получение описания дохода из таблицы БД для указанной подкатегории расходов"""
         self.cursor.execute(
             f'SELECT description '
             f'FROM income_categories '
@@ -62,6 +93,12 @@ class StatsQueries(Query):
         super().__init__()
 
     def get_today_stats(self, action: str):
+        """Получение статистики по расходам за текущий день.
+        :param action: Тип возвращаемого значения.
+        :type action: str
+        :returns: Статистика по расходам за текущий день.
+        :rtype: List[tuple] или str
+        """
         query = (
             f'SELECT SUM(amount) as summary, subcategorie, categorie '
             f'FROM expenses '
@@ -76,6 +113,12 @@ class StatsQueries(Query):
             return query
 
     def get_weekly_stats(self, action: str):
+        """Получение статистики по расходам за последнюю неделю.
+        :param action: Тип возвращаемого значения.
+        :type action: str
+        :returns: Статистика по расходам за последнюю неделю.
+        :rtype: List[tuple] или str
+        """
         query = (
             f'SELECT SUM(amount) as summary, subcategorie, categorie '
             f'FROM expenses '
@@ -91,6 +134,12 @@ class StatsQueries(Query):
             return query
 
     def get_monthly_stats(self, action: str):
+        """Получение статистики по расходам за текущий месяц.
+        :param action: Тип возвращаемого значения.
+        :type action: str
+        :returns: Статистика по расходам за текущий месяц.
+        :rtype: List[tuple] или str
+        """
         query = (
             f'SELECT SUM(amount) as summary, subcategorie, categorie '
             f'FROM expenses '
@@ -106,6 +155,12 @@ class StatsQueries(Query):
             return query
 
     def get_top_ten_stats(self, action: str):
+        """Получение статистики по расходам за всё время, отсортированной убыванию суммы.
+        :param action: Тип возвращаемого значения.
+        :type action: str
+        :returns: Статистика по расходам за всё время, отсортированной убыванию суммы.
+        :rtype: List[tuple] или str
+        """
         query = (
             f'SELECT SUM(amount) as summary, subcategorie, categorie '
             f'FROM expenses '
@@ -120,6 +175,10 @@ class StatsQueries(Query):
             return query
 
     def get_stats_dict(self):
+        """Получение словаря со статистикой по расходам за разные периоды времени.
+        :returns: Словарь со статистикой по расходам.
+        :rtype: Dict[str, List[tuple]]
+        """
         stats_dict = {
             'Сегодня': self.get_today_stats('handler'),
             'Неделя': self.get_weekly_stats('handler'),
@@ -131,10 +190,18 @@ class StatsQueries(Query):
 
 class DeleteQueries(Query):
     def __init__(self, table_name):
+        """Инициализация класса запросов для удаления данных.
+        :param table_name: Название таблицы, с которой будут работать запросы.
+        :type table_name: str
+        """
         self.table_name = table_name
         super().__init__()
 
     def show_last_five_transactions(self):
+        """Получение последних пяти транзакций.
+        :returns: Список кортежей с данными транзакций.
+        :rtype: List[tuple]
+        """
         query = (
             f'SELECT subcategorie, categorie, amount '
             f'FROM {self.table_name} '
@@ -156,6 +223,10 @@ class DeleteQueries(Query):
         return self.cursor.fetchall()
 
     def delete_last_transaction(self) -> str:
+        """Удаление последней транзакции.
+        :returns: Сообщение об удалении транзакции.
+        :rtype: str
+        """
         query = (
             f'DELETE FROM {self.table_name} '
             f'WHERE id=(SELECT MAX(id) FROM {self.table_name})'
@@ -165,6 +236,10 @@ class DeleteQueries(Query):
         return f'Последняя транзакция удалена'
 
     def delete_last_five_transactions(self) -> str:
+        """Удаление последних пяти транзакций.
+        :returns: Сообщение об удалении транзакций.
+        :rtype: str
+        """
         query = (
             f'DELETE FROM {self.table_name} '
             f'WHERE id IN '
@@ -175,6 +250,10 @@ class DeleteQueries(Query):
         return f'Последние пять транзакций удалены'
 
     def delete_current_month_transactions(self) -> str:
+        """Удаление транзакций за текущий месяц.
+        :returns: Сообщение об удалении транзакций.
+        :rtype: str
+        """
         query = (
             f'DELETE FROM {self.table_name} '
             f'WHERE DATE(time, "start of month")='
@@ -185,6 +264,9 @@ class DeleteQueries(Query):
         return f'Удалены транзакции за текущий месяц'
 
     def delete_choices_dict(self):
+        """Меню выбора для удаления транзакций
+        :returns: choices_dict
+        :rtype: dict"""
         choices_dict = {
             'Удалить_последнее': self.delete_last_transaction,
             'Удалить_последние_пять': self.delete_last_five_transactions,
@@ -199,14 +281,14 @@ class InitDB(Query):
         super().__init__()
 
     def _init_db(self):
-        """Инициализирует БД"""
+        """Инициализация БД"""
         with open("db/createdb.sql", "r") as f:
             sql = f.read()
         self.cursor.executescript(sql)
         self.connection.commit()
 
     def check_db_exists(self):
-        """Проверяет, инициализирована ли БД, если нет — инициализирует"""
+        """Проверка, инициализирована ли БД, если нет — инициализация"""
         self.cursor.execute(
             "SELECT name FROM sqlite_master "
             "WHERE type='table' AND name='expenses'"
