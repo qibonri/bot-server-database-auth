@@ -7,7 +7,7 @@ import os
 class Query:
     def __init__(self):
         """Инициализация класса - формы запроса в БД"""
-        self.connection = sqlite3.connect(os.path.join('db', 'finances.db'))
+        self.connection = sqlite3.connect(os.path.join('C:\\Users\\Viktoria\\PycharmProjects\\simple-finance-bot-main\\db\\finances.db'))
         self.cursor = self.connection.cursor()
 
 
@@ -282,7 +282,7 @@ class InitDB(Query):
 
     def _init_db(self):
         """Инициализация БД"""
-        with open("db/createdb.sql", "r") as f:
+        with open("createdb.sql", "r") as f:
             sql = f.read()
         self.cursor.executescript(sql)
         self.connection.commit()
