@@ -16,9 +16,9 @@ from middelwares import AccessMiddleware
 from keyboards import (MainMenu, ExpensesCategories, IncomeCategories, expenses_keyboards_dict, TextStats, TextGraph,
                        GraphStats, DeleteChoices)
 
-BOT_API_TOKEN: AnyStr = os.getenv('7049229917:AAG7o_muXfApHrdiaMwI8-qMCeHHkfooZs')
+BOT_API_TOKEN: AnyStr = os.getenv('7049229917:AAHQDyXrPT1NO6QGA0gn3hjxcFA0AkABNa8')
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token='7049229917:AAG7o_muXfApHrdiaMwI8-qMCeHHkfooZs')
+bot = Bot(token='7049229917:AAHQDyXrPT1NO6QGA0gn3hjxcFA0AkABNa8')
 dp = Dispatcher(bot, storage=MemoryStorage())
 #ACCESS_ID: AnyStr = os.getenv('MY_TELEGRAM_ID') # заглушка доступа
 #dp.middleware.setup(AccessMiddleware(ACCESS_ID)) # заглушка доступа
@@ -91,7 +91,6 @@ async def process_income_categorie(message: types.Message, state: FSMContext):
     """Получение дохода по категориям"""
     async with state.proxy() as data:
         data['categorie'] = message.text.split('/')[1]
-
     await IncomeForm.next()
     await message.reply('Введите сумму дохода')
 
@@ -142,7 +141,6 @@ async def process_expense_categorie(message: types.Message, state: FSMContext):
     categorie = message.text.split('/')[1]
     async with state.proxy() as data:
         data['categorie'] = categorie
-
     await ExpenseForm.next()
     await message.reply(
         'Выберите подкатегорию',
@@ -151,16 +149,13 @@ async def process_expense_categorie(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=ExpenseForm.subcategorie)
-async def process_expense_subcategorie(
-        message: types.Message, state: FSMContext
-):
+async def process_expense_subcategorie(message: types.Message, state: FSMContext):
     subcategorie = message.text.split('/')[1]
     async with state.proxy() as data:
         data['subcategorie'] = subcategorie
 
     await ExpenseForm.next()
     await message.reply('Введите сумму расхода')
-
 
 
 @dp.message_handler(
@@ -172,7 +167,6 @@ async def invalid_expense_amount(message: types.Message):
     await message.reply('Сумма должна быть числом\nВведите сумму расхода')
 
 
-#  Check amount is digit
 @dp.message_handler(
     lambda message: message.text.isdigit(),
     state=ExpenseForm.amount
@@ -209,9 +203,7 @@ async def text_stats(message: types.Message):
     await message.reply('Выберите за какое время вывести статистику', reply_markup=keyboard)
 
 
-@dp.message_handler(
-    commands=['Сегодня', 'Неделя', 'Месяц', 'За_всё_время']
-)
+@dp.message_handler(commands=['Сегодня', 'Неделя', 'Месяц', 'За_всё_время'])
 async def show_text_stats(message: types.Message):
     """Отображение статистики"""
     command = message.text.split('/')[1]
@@ -240,14 +232,11 @@ async def graph_stats(message: types.Message):
     await message.reply('Выберите за какое время вывести статистику', reply_markup=keyboard)
 
 
-@dp.message_handler(
-    commands=['Сегодня', 'Неделя', 'Месяц', 'За_всё_время']
-)
+@dp.message_handler(commands=['Сегодня', 'Неделя', 'Месяц', 'За_всё_время'])
 async def send_graph_stat(message: types.Message):
     """Создание и отправка графика выбранного типа"""
     stat_type = message.text.split('/')[1]
     GraphStatistic().create_plot(query_name=stat_type)
-    # need some time to create plot
     await message.answer('Вычисляю...Пожалуйста подождите')
     sleep(5)
     with open('graphs/output.png', 'rb') as f:
@@ -272,18 +261,14 @@ async def set_delete_state(message: types.Message, state: FSMContext):
     await message.reply('Выберите', reply_markup=keyboard)
 
 
-
 @dp.message_handler(state=DeleteForm.operation)
 async def process_delete_operation(message: types.Message, state: FSMContext):
     """Удаление расходов и доходов"""
     operation = message.text.split('/')[1]
     async with state.proxy() as data:
         data['operation'] = operation
-        delete_func_dict = DeleteQueries(
-            data['table_name']
-        ).delete_choices_dict()
+        delete_func_dict = DeleteQueries(data['table_name']).delete_choices_dict()
         result = delete_func_dict[data['operation']]()
-
     await state.finish()
     await message.reply(result, reply_markup=MAIN_MENU)
 
