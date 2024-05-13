@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./db:/mnt/db
+    environment:
+      - BOT_TOKEN='7049229917:AAHQDyXrPT1NO6QGA0gn3hjxcFA0AkABNa8'
